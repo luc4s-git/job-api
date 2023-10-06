@@ -10,9 +10,19 @@ const cors = require('cors')
 const xss = require('xss-clean')
 const rateLimiter = require('express-rate-limit')
 
+// Swagger
+const swaggerUI = require('swagger-ui-express')
+const YAML = require('yamljs')
+const swaggerDocument = YAML.load('./swagger.yaml')
+
 // connectDb
 const connectDB = require('./db/connect')
 const authenticateUser = require('./middleware/authentication')
+
+app.get('/', (req, res) => {
+  res.send('<h1>jobs API</h1><a href="/api-docs">Documentation</a>')
+})
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument))
 
 // routers 
 const authRouter = require('./routes/auth')
@@ -48,7 +58,7 @@ const start = async () => {
   try {
     await connectDB(process.env.MONGO_URI)
     app.listen(port, () =>
-      console.log(`Server is listening on port ${port}...\nAcess at: http://localhost:3000/`)
+      console.log(`Server is listening on port ${port}...\nAcess at: http://localhost:${port}/`)
     )
   } catch (error) {
     console.log(error)
